@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace WcfCalculatorClient.ViewModel
 {
-    internal abstract class BaseViewModel : INotifyPropertyChanged
+    public abstract class BaseViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

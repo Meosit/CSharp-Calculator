@@ -3,10 +3,9 @@ using System.Windows.Input;
 
 namespace WcfCalculatorClient.ViewModel
 {
-    public class RelayCommand : ICommand
+    public class RelayCommand<T> : ICommand
     {
-        private readonly Action _execute;
-        private readonly CanExecuteReference _canExecute;
+        private readonly Action<T> _execute;
 
         public event EventHandler CanExecuteChanged
         {
@@ -14,26 +13,20 @@ namespace WcfCalculatorClient.ViewModel
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public RelayCommand(Action execute, CanExecuteReference canExecute)
+        public RelayCommand(Action<T> execute)
         {
             this._execute = execute;
-            _canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute.Value;
+            return true;
         }
 
         public void Execute(object parameter)
         {
-            this._execute();
+            this._execute((T)parameter);
         }
     }
-
-
-    public class CanExecuteReference
-    {
-        public bool Value { get; set; }
-    }
+    
 }
