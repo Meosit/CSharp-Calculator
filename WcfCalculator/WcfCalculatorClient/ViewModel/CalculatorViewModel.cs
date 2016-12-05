@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -8,34 +9,38 @@ namespace WcfCalculatorClient.ViewModel
 {
     public class CalculatorViewModel : BaseViewModel
     {
-        private readonly Regex _inputExpressionRegex = new Regex(@"^-?(√?\d+(,\d+)?)([+\-*/](√?\d+(,\d+)?))*$");
+        private readonly Regex _inputExpressionRegex = new Regex(@"^-?(√?\d+(\.\d+)?)([+\-*/](√?\d+(\.\d+)?))*$");
         private readonly CalculatorModel _model;
 
         public CalculatorViewModel()
         {
             CalculateCommand = new RelayCommand<string>(param =>
-                        OutputText = IsValidInput(InputText) ? _model.Calculate(param) : "Invalid Input"
+                        OutputText = IsValidInput(InputText) ? _model.Calculate(InputText) : "Invalid Input"
             );
             InputCommand = new RelayCommand<string>(input =>
             {
                 InputText += input;
                 InputTextBackground = IsValidInput(InputText) ? Brushes.White : Brushes.Crimson;
             });
-            EarseCommand = new RelayCommand<string>(param => OutputText = "");
+            EarseCommand = new RelayCommand<string>(param => InputText = "");
             BackspaceCommand = new RelayCommand<string>(param =>
             {
-                if (OutputText.Length != 0)
+                if (InputText.Length > 0)
                 {
-                    OutputText = OutputText.Remove(OutputText.Length - 1);
+                    InputText = InputText.Remove(InputText.Length - 1);
                 }
+                InputTextBackground = IsValidInput(InputText) ? Brushes.White : Brushes.Crimson;
             });
             _model = new CalculatorModel();
+            WindowCloseCommand = new RelayCommand<object>(o => _model.CloseService());
         }
 
 
         public ICommand InputCommand { get; }
         public ICommand CalculateCommand { get; }
-
+        public ICommand EarseCommand { get; }
+        public ICommand BackspaceCommand { get; }
+        public ICommand WindowCloseCommand { get; }
 
         private string _inputText = "";
         private Brush _inputTextBackground = Brushes.White;
@@ -71,9 +76,6 @@ namespace WcfCalculatorClient.ViewModel
                 OnPropertyChanged();
             }
         }
-
-        public ICommand EarseCommand { get; }
-        public ICommand BackspaceCommand { get; }
 
         private bool IsValidInput(string input)
         {

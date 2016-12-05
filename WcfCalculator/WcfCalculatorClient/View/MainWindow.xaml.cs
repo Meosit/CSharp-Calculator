@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace WcfCalculatorClient.View
+namespace WcfCalculatorClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

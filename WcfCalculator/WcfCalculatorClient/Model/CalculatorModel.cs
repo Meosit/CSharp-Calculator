@@ -1,20 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.ServiceModel;
 using System.Text.RegularExpressions;
-using WcfCalculator;
+using WcfCalculatorClient.CalculatorServiceReference;
 
 namespace WcfCalculatorClient.Model
 {
     class CalculatorModel
     {
-        private readonly ICalculator _calculatorService;
+        private readonly Regex _expressionUnitRegex = new Regex(@"[\-+*/]|√?[^\-+√*/]+");
+        private readonly Dictionary<string, Func<double, double, double>> _serviceFunctions;
+        private readonly MySuperCalculatorClient _client;
 
         public CalculatorModel()
         {
-            var binding = new BasicHttpBinding();
-            var endpoint = new EndpointAddress("http://localhost:8000/");
-            var channelFactory = new ChannelFactory<ICalculator>(binding, endpoint);
-            _calculatorService = channelFactory.CreateChannel();
+            
+            _client = new MySuperCalculatorClient();
+            _serviceFunctions = new Dictionary<string, Func<double, double, double>>()
+            {
+                {"+", ((a, b) => _client.Add(a, b))},
+                {"-", ((a, b) => _client.Substract(a, b))},
+                {"*", ((a, b) => _client.Multiply(a, b))},
+                {"/", ((a, b) => _client.Divide(a, b))}
+            };
         }
 
         public string Calculate(string expr)
@@ -25,25 +34,25 @@ namespace WcfCalculatorClient.Model
                 {
                     expr = "0" + expr;
                 }
-                Match match = Regex.Match(expr, @"^([\-+*/]|√?[^\-+*/]+)+$");
+                MatchCollection matches = _expressionUnitRegex.Matches(expr);
                 double result;
-                if (match.Groups.Count == 1)
+                if (matches.Count == 1)
                 {
-                    result = CalculateUnaryOperator(match.Groups[0].Value);
+                    result = CalculateUnaryOperator(matches[0].Value);
                 }
                 else
                 {
-                    double a = Double.Parse(match.Groups[1].Value);
-                    double b = Double.Parse(match.Groups[3].Value);
-                    result = CalculateBinaryOperator(a, b, match.Groups[2].Value);
-                    for (int i = 4; i < match.Groups.Count - 1; i+= 2)
+                    double a = CalculateUnaryOperator(matches[0].Value);
+                    double b = CalculateUnaryOperator(matches[2].Value);
+                    result = CalculateBinaryOperator(a, b, matches[1].Value);
+                    for (int i = 3; i < matches.Count - 1; i += 2)
                     {
-                        b = Double.Parse(match.Groups[i + 1].Value);
-                        result = CalculateBinaryOperator(result, b, match.Groups[i].Value);
+                        b = CalculateUnaryOperator(matches[i + 1].Value);
+                        result = CalculateBinaryOperator(result, b, matches[i].Value);
                     }
                 }
 
-                return result.ToString();
+                return result.ToString(CultureInfo.InvariantCulture);
             }
             catch (TimeoutException)
             {
@@ -57,26 +66,7 @@ namespace WcfCalculatorClient.Model
 
         private double CalculateBinaryOperator(double a, double b, string operatorSign)
         {
-            double result;
-            switch (operatorSign)
-            {
-                case "*":
-                    result = _calculatorService.Multiply(a, b);
-                    break;
-                case "/":
-                    result = _calculatorService.Divide(a, b);
-                    break;
-                case "-":
-                    result = _calculatorService.Substract(a, b);
-                    break;
-                case "+":
-                    result = _calculatorService.Add(a, b);
-                    break;
-                default:
-                    result = Double.NaN;
-                    break;
-            }
-            return result;
+            return _serviceFunctions[operatorSign].Invoke(a, b);
         }
 
         private double CalculateUnaryOperator(string operand)
@@ -85,7 +75,7 @@ namespace WcfCalculatorClient.Model
             if (operand[0] == '√')
             {
                 double a = Double.Parse(operand.Remove(0, 1));
-                result = _calculatorService.Sqrt(a);
+                result = _client.Sqrt(a);
             }
             else
             {
@@ -96,8 +86,7 @@ namespace WcfCalculatorClient.Model
 
         public void CloseService()
         {
-            var communicationObject = (ICommunicationObject) _calculatorService;
-            communicationObject?.Close();
+            _client?.Close();
         }
     }
 }

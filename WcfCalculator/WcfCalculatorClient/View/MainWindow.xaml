@@ -4,17 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:WcfCalculatorClient.ViewModel"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="Calculator" Height="375" Width="245">
-    <Grid Margin="0,0,2,0">
+        Title="Calculator" Height="395" Width="251">
+    <Grid Margin="0,20,0,0">
 
         <Grid.DataContext>
             <vm:CalculatorViewModel/>
         </Grid.DataContext>
-
-        <TextBox FontSize="16" VerticalContentAlignment="Center" IsReadOnly="True" Height="25" TextWrapping="Wrap" Background="{Binding InputTextBackground}" Text="{Binding InputText}" VerticalAlignment="Bottom" Margin="10,0,0,311" HorizontalAlignment="Left" Width="217"/>
-        <TextBox FontSize="16" VerticalContentAlignment="Center" IsReadOnly="True" Height="25" Margin="0,0,10,286" TextWrapping="Wrap" Text="{Binding OutputText}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="217"/>
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Closing">
+                <i:InvokeCommandAction Command="{Binding WindowCloseCommand}" CommandParameter="{Binding}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <TextBox FontSize="16" VerticalContentAlignment="Center" IsReadOnly="True" TextWrapping="Wrap" Background="{Binding InputTextBackground}" Text="{Binding InputText}" Margin="10,0,10,0" Height="25" VerticalAlignment="Top"/>
+        <TextBox FontSize="16" VerticalContentAlignment="Center" IsReadOnly="True" Margin="10,30,10,0" TextWrapping="Wrap" Text="{Binding OutputText}" VerticalAlignment="Top" Height="25"/>
         <Button FontSize="20" CommandParameter="1" Command="{Binding InputCommand}" FontWeight="Bold" Content="1" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="2" Command="{Binding InputCommand}" FontWeight="Bold" Content="2" HorizontalAlignment="Left" Margin="65,120,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="3" Command="{Binding InputCommand}" FontWeight="Bold" Content="3" HorizontalAlignment="Left" Margin="120,120,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
@@ -25,14 +30,14 @@
         <Button FontSize="20" CommandParameter="8" Command="{Binding InputCommand}" FontWeight="Bold" Content="8" HorizontalAlignment="Left" Margin="65,230,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="9" Command="{Binding InputCommand}" FontWeight="Bold" Content="9" HorizontalAlignment="Left" Margin="120,230,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="0" Command="{Binding InputCommand}" FontWeight="Bold" Content="0" HorizontalAlignment="Left" Margin="65,285,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
-        <Button FontSize="20" FontWeight="Bold" Content="," HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top" Width="50" Height="50" RenderTransformOrigin="0.56,1.52"/>
+        <Button FontSize="20" FontWeight="Bold" Content="." HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="+" Command="{Binding InputCommand}" Content="+" HorizontalAlignment="Left" Margin="120,65,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="-" Command="{Binding InputCommand}" Content="−" HorizontalAlignment="Left" Margin="175,65,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
-        <Button FontSize="20" CommandParameter="*" Command="{Binding InputCommand}" Content="×" HorizontalAlignment="Left" Margin="175,175,0,0" VerticalAlignment="Top" Width="50" Height="50" RenderTransformOrigin="1.37,1.1"/>
+        <Button FontSize="20" CommandParameter="*" Command="{Binding InputCommand}" Content="×" HorizontalAlignment="Left" Margin="175,175,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" CommandParameter="/" Command="{Binding InputCommand}" Content="÷" HorizontalAlignment="Left" Margin="175,120,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
-        <Button FontSize="20" CommandParameter="√" Command="{Binding InputCommand}" Content="√" HorizontalAlignment="Left" Margin="175,229,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
+        <Button FontSize="20" CommandParameter="√" Command="{Binding InputCommand}" Content="√" HorizontalAlignment="Left" Margin="175,230,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
         <Button FontSize="20" Content="=" Command="{Binding CalculateCommand}" HorizontalAlignment="Left" Margin="120,285,0,0" VerticalAlignment="Top" Width="105" Height="50"/>
-        <Button FontSize="15" Content="C" Command="{Binding EarseCommand}" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
+        <Button FontSize="15" Content="C" Command="{Binding EarseCommand}" Margin="10,65,175,0" VerticalAlignment="Top" Height="50"/>
         <Button FontSize="15" Content="⌫" Command="{Binding BackspaceCommand}" HorizontalAlignment="Left" Margin="65,65,0,0" VerticalAlignment="Top" Width="50" Height="50"/>
 
     </Grid>

@@ -29,7 +29,6 @@ namespace WcfCalculator
                 };
                 throw new FaultException<MathFault>(fault);
             }
-            
         }
 
         public double Substract(double a, double b)
@@ -71,7 +70,7 @@ namespace WcfCalculator
             }
             try
             {
-                return a * b;
+                return a*b;
             }
             catch (OverflowException)
             {
@@ -95,11 +94,7 @@ namespace WcfCalculator
                 };
                 throw new FaultException<MathFault>(fault);
             }
-            try
-            {
-                return a / b;
-            }
-            catch (DivideByZeroException)
+            if (b == 0)
             {
                 MathFault fault = new MathFault()
                 {
@@ -108,6 +103,7 @@ namespace WcfCalculator
                 };
                 throw new FaultException<MathFault>(fault);
             }
+            return a/b;
         }
 
         public double Sqrt(double a)
